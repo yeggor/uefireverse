@@ -107,14 +107,14 @@ typedef struct __attribute__((packed)) {
 	UINT8 Type;
 	UINT8 SubType;
 	UINT8 Length[2];
-} EFI_DEVICE_PATH_PROTOCOL;
+} EFI_DEVICE_PATH2_PROTOCOL;
 
 typedef struct {
 	UINT32                   Revision;
 	EFI_HANDLE               ParentHandle;
 	EFI_SYSTEM_TABLE         *SystemTable;
 	EFI_HANDLE               DeviceHandle;
-	EFI_DEVICE_PATH_PROTOCOL *FilePath;
+	EFI_DEVICE_PATH2_PROTOCOL *FilePath;
 	VOID                     *Reserved;
 	UINT32                   LoadOptionsSize;
 	VOID                     *LoadOptions;
@@ -123,7 +123,7 @@ typedef struct {
 	EFI_MEMORY_TYPE          ImageCodeType;
 	EFI_MEMORY_TYPE          ImageDataType;
 	VOID*                    Unload;
-} EFI_LOADED_IMAGE_PROTOCOL;
+} EFI_LOADED_IMAGE2_PROTOCOL;
 
 typedef struct {
 	void* data;
@@ -146,8 +146,8 @@ static EFI_GRAPHICS_OUTPUT_PROTOCOL g_efi_graphics_output_protocol={};
 static EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE g_efi_graphics_output_protocol_Mode={};
 static EFI_HII_DATABASE_PROTOCOL g_efi_hii_database_protocol={};
 static EFI_ACPI_SUPPORT_PROTOCOL g_efi_acpi_support_protocol={};
-static EFI_DEVICE_PATH_PROTOCOL g_empty_efi_device_path_protocol={0x7f,0xff,{0,0}};
-static EFI_LOADED_IMAGE_PROTOCOL g_efi_loaded_image_protocol={};
+static EFI_DEVICE_PATH2_PROTOCOL g_empty_efi_device_path_protocol={0x7f,0xff,{0,0}};
+static EFI_LOADED_IMAGE2_PROTOCOL g_efi_loaded_image_protocol={};
 
 static list<GenericHook<const char*>> g_str_hooks;
 static unordered_multimap<EFI_GUID,pair<EFI_HANDLE,void*>> g_interfaces;
@@ -481,13 +481,13 @@ void efi_hooks_init()
 	register_memory({&g_efi_acpi_support_protocol,sizeof(g_efi_acpi_support_protocol),"EFI_ACPI_SUPPORT_PROTOCOL"});
 	
 	g_interfaces.emplace(gEfiDevicePathProtocolGuid,make_pair((EFI_HANDLE)NULL,&g_empty_efi_device_path_protocol));
-	register_memory({&g_empty_efi_device_path_protocol,sizeof(g_empty_efi_device_path_protocol),"EFI_DEVICE_PATH_PROTOCOL"});
+	register_memory({&g_empty_efi_device_path_protocol,sizeof(g_empty_efi_device_path_protocol),"EFI_DEVICE_PATH2_PROTOCOL"});
 
 	g_efi_loaded_image_protocol.SystemTable=&g_efi_system_table;
 	g_efi_loaded_image_protocol.FilePath=&g_empty_efi_device_path_protocol;
 	ABORTHOOK(g_efi_loaded_image_protocol,Unload);
 	g_interfaces.emplace(gEfiLoadedImageProtocolGuid,make_pair((EFI_HANDLE)NULL,&g_efi_loaded_image_protocol));
-	register_memory({&g_efi_loaded_image_protocol,sizeof(g_efi_loaded_image_protocol),"EFI_LOADED_IMAGE_PROTOCOL"});
+	register_memory({&g_efi_loaded_image_protocol,sizeof(g_efi_loaded_image_protocol),"EFI_LOADED_IMAGE2_PROTOCOL"});
 
 	g_efi_system_table.ConIn=&g_efi_system_table_ConIn;
 	g_efi_system_table_ConOut.Mode=&g_efi_system_table_ConOut_Mode;
